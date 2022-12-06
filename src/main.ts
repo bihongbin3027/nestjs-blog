@@ -24,7 +24,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe()); // 注册传参验证管道
   app.useGlobalFilters(new HttpExceptionFilter()); // 注册全局错误的过滤器
-  app.useGlobalInterceptors(new HttpTransformInterceptor()); // 全局注册拦截器
+  app.useGlobalInterceptors(new HttpTransformInterceptor()); // 注册全局拦截器
 
   await app.listen(3066);
 }

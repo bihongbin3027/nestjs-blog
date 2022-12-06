@@ -9,6 +9,7 @@ import { UserEntity } from 'src/user/entities/user.entity';
 import { LocalStorage } from './local.strategy';
 import { JwtStorage } from './jwt.strategy';
 import { UserModule } from 'src/user/user.module';
+import { RedisCacheModule } from 'src/core/db/redis-cache.module';
 import { UserService } from 'src/user/user.service';
 
 const jwtModule = JwtModule.registerAsync({
@@ -16,7 +17,6 @@ const jwtModule = JwtModule.registerAsync({
   useFactory: async (configService: ConfigService) => {
     return {
       secret: configService.get('SECRET'),
-      signOptions: { expiresIn: '4h' },
     };
   },
 });
@@ -27,9 +27,9 @@ const jwtModule = JwtModule.registerAsync({
     PassportModule,
     jwtModule,
     UserModule,
+    RedisCacheModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, UserService, LocalStorage, JwtStorage],
-  exports: [jwtModule],
 })
 export class AuthModule {}

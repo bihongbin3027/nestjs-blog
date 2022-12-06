@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { RedisCacheModule } from 'src/core/db/redis-cache.module';
 
 @Module({
   imports: [
@@ -14,8 +15,8 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true, // 设置为全局
       envFilePath: [envConfig.path],
     }),
+    // 连接mysql
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         type: 'mysql', // 数据库类型
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
     PostsModule,
     UserModule,
     AuthModule,
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],

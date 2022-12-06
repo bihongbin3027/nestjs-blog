@@ -19,6 +19,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('用户')
 @Controller('user')
+@UseGuards(AuthGuard('jwt'))
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -30,8 +32,6 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '获取用户信息' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getUserInfo(@Req() req: any) {
     return req.user;

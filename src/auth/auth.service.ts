@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { RedisCacheService } from 'src/core/db/redis-cache.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
+    private redisCacheService: RedisCacheService,
   ) {}
 
   // 生成token
@@ -21,6 +23,13 @@ export class AuthService {
       username: user.username,
       role: user.role,
     });
+
+    await this.redisCacheService.cacheSet(
+      `${user.id}&${user.username}&${user.role}`,
+      token,
+      1800,
+    );
+
     return { token };
   }
 
