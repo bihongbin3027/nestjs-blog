@@ -19,8 +19,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('用户')
 @Controller('user')
-@UseGuards(AuthGuard('jwt'))
-@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -32,6 +30,8 @@ export class UserController {
   }
 
   @ApiOperation({ summary: '获取用户信息' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Get()
   async getUserInfo(@Req() req: any) {
     return req.user;
@@ -39,16 +39,16 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+    return this.userService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUser: UpdateUserDto) {
-    return this.userService.update(+id, updateUser);
+    return this.userService.update(id, updateUser);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.remove(id);
   }
 }

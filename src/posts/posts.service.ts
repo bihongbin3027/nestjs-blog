@@ -1,7 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CategoryService } from 'src/category/category.service';
+import { TagService } from 'src/tag/tag.service';
 import { Repository, Like } from 'typeorm';
-import { QueryPostPageDto } from './dto/create-post.dto';
+import { CreatePostDto, QueryPostPageDto } from './dto/create-post.dto';
 import { PostsEntity } from './posts.entity';
 
 export interface PostsRo {
@@ -13,29 +15,48 @@ export class PostsService {
   constructor(
     @InjectRepository(PostsEntity)
     private readonly postsRepository: Repository<PostsEntity>,
+    private readonly categoryService: CategoryService,
+    private readonly tagService: TagService,
   ) {}
 
   // 创建文章
-  async create(post: Partial<PostsEntity>): Promise<PostsEntity> {
-    const { title } = post;
+  async create(user: any, post: CreatePostDto) {
+    const { title, tag, category = 0, status } = post;
 
     if (!title) {
-      throw new HttpException('缺少文章标题', 401);
+      throw new HttpException('缺少文章标题', HttpStatus.BAD_REQUEST);
     }
 
     const doc = await this.postsRepository.findOne({ where: { title } });
 
     if (doc) {
-      throw new HttpException('文章已存在', 401);
+      throw new HttpException('文章已存在', HttpStatus.BAD_REQUEST);
     }
 
-    const newPost = this.postsRepository.create(post);
+    const categoryDoc = await this.categoryService.findById(category);
+    const tags = await this.tagService.findByIds(('' + tag).split(','));
+    const postParam: Partial<PostsEntity> = {
+      ...post,
+      category: categoryDoc,
+      tags: tags,
+      author: user,
+    };
 
-    return await this.postsRepository.save(newPost);
+    // 发布
+    if (status === 'publish') {
+      Object.assign(postParam, {
+        publishTime: new Date(),
+      });
+    }
+
+    const newPost: PostsEntity = this.postsRepository.create({ ...postParam });
+    const created = await this.postsRepository.save(newPost);
+
+    return created.id;
   }
 
   // 获取文章列表
-  async findAll(query: QueryPostPageDto): Promise<PostsRo> {
+  async findAll(query: QueryPostPageDto) {
     const take = query.pageSize || 10;
     const page = query.pageNum || 1;
     const skip = (page - 1) * take;
@@ -44,34 +65,56 @@ export class PostsService {
     const [result, total] = await this.postsRepository.findAndCount({
       where: { title: Like('%' + keyword + '%') },
       order: {
-        create_time: 'DESC',
+        createTime: 'DESC',
       },
       skip,
       take,
     });
 
-    return { list: result, count: total };
+    return {
+      list: result.map((item) => item.toResponseObject()),
+      count: total,
+    };
   }
 
   // 获取指定id文章
-  async findById(id: number): Promise<PostsEntity | null> {
-    return await this.postsRepository.findOneBy({ id });
+  async findById(id: number) {
+    const qb = this.postsRepository
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.category', 'category')
+      .leftJoinAndSelect('posts.tags', 'tag')
+      .leftJoinAndSelect('posts.author', 'user')
+      .where('posts.id=:id')
+      .setParameter('id', id);
+
+    const result = await qb.getOne();
+    if (!result) {
+      throw new HttpException(`id为${id}的文章不存在`, HttpStatus.BAD_REQUEST);
+    }
+    await this.postsRepository.update(id, { count: result.count + 1 });
+
+    return result.toResponseObject();
   }
 
   // 更新指定id文章
-  async updateById(
-    id: number,
-    post: Partial<PostsEntity>,
-  ): Promise<PostsEntity> {
-    const existPost = await this.postsRepository.findOneBy({ id });
-
+  async updateById(id: number, post: CreatePostDto) {
+    const existPost = await this.postsRepository.findOne({ where: { id } });
     if (!existPost) {
-      throw new HttpException(`id为${id}的文章不存在`, 401);
+      throw new HttpException(`id为${id}的文章不存在`, HttpStatus.BAD_REQUEST);
     }
 
-    const updatePost = this.postsRepository.merge(existPost, post);
+    const { category, tag, status } = post;
+    const tags = await this.tagService.findByIds(('' + tag).split(','));
+    const categoryDoc = await this.categoryService.findById(category);
+    const newPost = {
+      ...post,
+      category: categoryDoc,
+      tags,
+      publishTime: status === 'publish' ? new Date() : existPost.publishTime,
+    };
 
-    return this.postsRepository.save(updatePost);
+    const updatePost = this.postsRepository.merge(existPost, newPost);
+    return (await this.postsRepository.save(updatePost)).id;
   }
 
   // 删除指定id文章
@@ -79,7 +122,7 @@ export class PostsService {
     const existPost = await this.postsRepository.findOneBy({ id });
 
     if (!existPost) {
-      throw new HttpException(`id为${id}的文章不存在`, 401);
+      throw new HttpException(`id为${id}的文章不存在`, HttpStatus.BAD_REQUEST);
     }
 
     return await this.postsRepository.delete(id);

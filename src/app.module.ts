@@ -8,6 +8,8 @@ import { PostsModule } from './posts/posts.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisCacheModule } from 'src/core/db/redis-cache.module';
+import { CategoryModule } from './category/category.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { RedisCacheModule } from 'src/core/db/redis-cache.module';
     UserModule,
     AuthModule,
     RedisCacheModule,
+    CategoryModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService],
