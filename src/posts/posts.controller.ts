@@ -17,9 +17,9 @@ import { CreatePostDto, QueryPostPageDto } from './dto/create-post.dto';
 import { Roles, RolesGuard } from 'src/auth/role.guard';
 
 @ApiTags('文章')
+@ApiBearerAuth()
 @Controller('posts')
 @UseGuards(AuthGuard('jwt'))
-@ApiBearerAuth()
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 

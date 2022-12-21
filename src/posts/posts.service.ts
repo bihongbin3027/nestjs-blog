@@ -4,7 +4,7 @@ import { CategoryService } from 'src/category/category.service';
 import { TagService } from 'src/tag/tag.service';
 import { Repository, Like } from 'typeorm';
 import { CreatePostDto, QueryPostPageDto } from './dto/create-post.dto';
-import { PostsEntity } from './posts.entity';
+import { PostsEntity } from './entities/posts.entity';
 
 export interface PostsRo {
   list: PostsEntity[];
@@ -22,10 +22,6 @@ export class PostsService {
   // 创建文章
   async create(user: any, post: CreatePostDto) {
     const { title, tag, category = 0, status } = post;
-
-    if (!title) {
-      throw new HttpException('缺少文章标题', HttpStatus.BAD_REQUEST);
-    }
 
     const doc = await this.postsRepository.findOne({ where: { title } });
 

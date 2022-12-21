@@ -8,10 +8,10 @@ import {
   ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
+import { LocalAuthGuard } from './local-auth.guard';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('验证')
 @Controller('auth')
@@ -19,10 +19,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: '登录' })
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('login')
   async login(@Body() user: LoginDto, @Req() req: any) {
+    // 通过req获取到local策略validate方法返回的user
     return await this.authService.login(req.user);
   }
 }

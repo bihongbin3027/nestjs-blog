@@ -23,6 +23,8 @@ export class UserService {
       throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST);
     }
 
+    console.log('createUser', createUser);
+
     const newUser = await this.userRepository.create(createUser);
 
     return await this.userRepository.save(newUser);

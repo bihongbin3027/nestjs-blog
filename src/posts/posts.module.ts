@@ -4,7 +4,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { CategoryModule } from 'src/category/category.module';
 import { TagModule } from 'src/tag/tag.module';
 import { PostsController } from './posts.controller';
-import { PostsEntity } from './posts.entity';
+import { PostsEntity } from './entities/posts.entity';
 import { PostsService } from './posts.service';
 
 @Module({

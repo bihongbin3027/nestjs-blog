@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcryptjs';
-import { PostsEntity } from 'src/posts/posts.entity';
+import { PostsEntity } from 'src/posts/entities/posts.entity';
 
 @Entity('user')
 export class UserEntity {

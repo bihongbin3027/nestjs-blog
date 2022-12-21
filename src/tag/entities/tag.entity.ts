@@ -1,4 +1,4 @@
-import { PostsEntity } from 'src/posts/posts.entity';
+import { PostsEntity } from 'src/posts/entities/posts.entity';
 import {
   Column,
   CreateDateColumn,

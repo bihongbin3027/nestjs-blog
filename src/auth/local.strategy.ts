@@ -1,9 +1,9 @@
 /*
- * @Description 本地验证策略
+ * @Description 本地策略验证账号和密码是否存在
  * @Author bihongbin
  * @Date 2022-11-28 16:18:01
  * @LastEditors bihongbin
- * @LastEditTime 2022-11-28 16:39:43
+ * @LastEditTime 2022-12-20 17:22:26
  */
 import { BadGatewayException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,7 +13,7 @@ import { IStrategyOptions, Strategy } from 'passport-local';
 import * as bcryptjs from 'bcryptjs';
 import { UserEntity } from 'src/user/entities/user.entity';
 
-export class LocalStorage extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -30,7 +30,6 @@ export class LocalStorage extends PassportStrategy(Strategy) {
       .addSelect('user.password') // 向SELECT查询添加新选择
       .where('user.username=:username', { username }) // 在查询生成器中设置WHERE条件
       .getOne(); // 获取通过执行生成的查询生成器sql返回的单个实体
-
     if (!user) {
       throw new BadGatewayException('用户名不正确！');
     }

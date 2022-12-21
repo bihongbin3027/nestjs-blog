@@ -8,6 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 
+// SetMetadata作用：将获取到的值，设置到元数据中，然后守卫通过反射器才能获取到值
 export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 
 @Injectable()

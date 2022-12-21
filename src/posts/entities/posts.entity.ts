@@ -11,7 +11,7 @@ import { UserEntity } from 'src/user/entities/user.entity';
 import { CategoryEntity } from 'src/category/entities/category.entity';
 import { Exclude } from 'class-transformer';
 import { TagEntity } from 'src/tag/entities/tag.entity';
-import { PostInfoDto } from './dto/create-post.dto';
+import { PostInfoDto } from '../dto/create-post.dto';
 
 @Entity('posts')
 export class PostsEntity {
@@ -56,7 +56,7 @@ export class PostsEntity {
   status: string;
 
   // 作者
-  @ManyToOne(() => UserEntity, (user) => user.nickname)
+  @ManyToOne(() => UserEntity, (user) => user.posts)
   @JoinColumn({
     name: 'author_id',
   })
