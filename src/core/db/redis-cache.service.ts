@@ -12,7 +12,7 @@ export class RedisCacheService {
     this.cacheManager.set(key, value, ttl);
   }
 
-  async cacheGet(key: string) {
+  cacheGet(key: string) {
     return this.cacheManager.get(key);
   }
 }

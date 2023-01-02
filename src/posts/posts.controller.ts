@@ -11,22 +11,22 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { PostsService } from './posts.service';
 import { CreatePostDto, QueryPostPageDto } from './dto/create-post.dto';
 import { Roles, RolesGuard } from 'src/auth/role.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('文章')
 @ApiBearerAuth()
 @Controller('posts')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @ApiOperation({ summary: '创建文章' })
   @Post()
   @Roles('root', 'author')
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   async create(@Body() post: CreatePostDto, @Req() req: any) {
     return await this.postsService.create(req.user, post);
   }

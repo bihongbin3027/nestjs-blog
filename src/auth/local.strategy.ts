@@ -3,9 +3,9 @@
  * @Author bihongbin
  * @Date 2022-11-28 16:18:01
  * @LastEditors bihongbin
- * @LastEditTime 2022-12-20 17:22:26
+ * @LastEditTime 2022-12-26 12:00:04
  */
-import { BadGatewayException, BadRequestException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PassportStrategy } from '@nestjs/passport';
@@ -31,7 +31,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       .where('user.username=:username', { username }) // 在查询生成器中设置WHERE条件
       .getOne(); // 获取通过执行生成的查询生成器sql返回的单个实体
     if (!user) {
-      throw new BadGatewayException('用户名不正确！');
+      throw new BadRequestException('用户名不正确！');
     }
 
     if (!bcryptjs.compareSync(password, user.password)) {
