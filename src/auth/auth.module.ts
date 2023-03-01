@@ -9,7 +9,6 @@ import { AuthController } from './auth.controller';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
-import { UserModule } from 'src/user/user.module';
 import { RedisCacheModule } from 'src/core/db/redis-cache.module';
 import { UserService } from 'src/user/user.service';
 
@@ -27,7 +26,6 @@ const jwtModule = JwtModule.registerAsync({
     TypeOrmModule.forFeature([UserEntity]),
     PassportModule,
     jwtModule,
-    UserModule,
     RedisCacheModule,
   ],
   controllers: [AuthController],
