@@ -69,7 +69,9 @@ export class PostsService {
 
     return {
       list: result.map((item) => item.toResponseObject()),
-      count: total,
+      pageNum: page,
+      pageSize: take,
+      total: total,
     };
   }
 

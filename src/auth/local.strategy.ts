@@ -3,17 +3,17 @@
  * @Author bihongbin
  * @Date 2022-11-28 16:18:01
  * @LastEditors bihongbin
- * @LastEditTime 2022-12-26 12:00:04
+ * @LastEditTime 2023-03-08 09:48:34
  */
 import { BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PassportStrategy } from '@nestjs/passport';
 import { IStrategyOptions, Strategy } from 'passport-local';
-import * as bcryptjs from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 import { UserEntity } from 'src/user/entities/user.entity';
 
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -34,7 +34,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new BadRequestException('用户名不正确！');
     }
 
-    if (!bcryptjs.compareSync(password, user.password)) {
+    if (!bcrypt.compareSync(password, user.password)) {
       throw new BadRequestException('密码错误！');
     }
 

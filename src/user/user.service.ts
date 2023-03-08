@@ -23,23 +23,22 @@ export class UserService {
       throw new HttpException('用户名已存在', HttpStatus.BAD_REQUEST);
     }
 
-    console.log('createUser', createUser);
-
     const newUser = await this.userRepository.create(createUser);
 
     return await this.userRepository.save(newUser);
   }
 
-  create(createUserDto: CreateUserDto) {
+  // 获取用户信息
+  async findOne(id: string) {
+    return await this.userRepository.findOneBy({ id });
+  }
+
+  create() {
     return 'This action adds a new user';
   }
 
   findAll() {
     return `This action returns all user`;
-  }
-
-  async findOne(id: string) {
-    return await this.userRepository.findOneBy({ id });
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {

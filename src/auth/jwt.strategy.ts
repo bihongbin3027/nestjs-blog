@@ -3,20 +3,22 @@
  * @Author bihongbin
  * @Date 2022-12-01 14:43:13
  * @LastEditors bihongbin
- * @LastEditTime 2022-12-26 11:27:58
+ * @LastEditTime 2023-03-08 11:09:42
  */
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { StrategyOptions, Strategy, ExtractJwt } from 'passport-jwt';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { RedisCacheService } from 'src/core/db/redis-cache.service';
 
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
     private readonly redisCacheService: RedisCacheService,
@@ -24,6 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.get('SECRET'),
+      passReqToCallback: true,
     } as StrategyOptions);
   }
 
